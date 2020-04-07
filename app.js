@@ -37,6 +37,29 @@ connection.connect();
  
 // connection.end();
 
+// 我的--注册
+app.post('/api/regist',(req,res)=>{
+    connection.query("INSERT  into test.user VALUES("+null+",'"+req.body.password+"','"+req.body.username+"',"+null+",'"+req.body.phone+"' )" 
+    , function (error, results, fields) {
+        if (error) throw error;
+        res.send('注册成功')
+      });
+})
+
+// 我的--登录
+app.post('/api/login',(req,res)=>{
+    connection.query("SELECT * from user where phone =  '"+ req.body.phone+"'", function (error, results, fields) {
+        if (error) throw error;
+        if(req.body.password == results[0].password ){
+            let data ={}
+            data.username = results[0].username
+            data.phone = results[0].phone
+            res.send(data)
+        }else{
+            res.send('登录失败')
+        }
+      });
+})
 
 // 首页--获取所有酒店
 app.get('/api/hotelList',(req,res)=>{
@@ -109,6 +132,16 @@ app.get('/api/searchOrder',(req,res)=>{
     connection.query("SELECT * from test.order where id =  '"+ req.query.id+"'", function (error, results, fields) {
         if (error) throw error;
         res.send(results[0])
+      });
+})
+
+// 订单列表
+app.get('/api/searchOrderList',(req,res)=>{
+    let str = 
+    "SELECT  order.id,order.hotelId,status,order.price, startDate,endDate,dayNum,roomNum,people,hotel.name,room.name as rName,picture,room.price as rPrice,room.type from test.order   INNER JOIN test.hotel ON hotel.id = test.order.hotelId  INNER JOIN test.room ON room.id = test.order.roomId  and test.order.phone = " + req.query.phone
+    connection.query( str , function (error, results, fields) {
+        if (error) throw error;
+        res.send(results)
       });
 })
 
